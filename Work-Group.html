@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نموذج مقترح توزيع الكوادر البشرية</title>
+    <!-- استدعاء مكتبة html2canvas لتحويل الصفحة لـ PNG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #2980b9;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #2980b9;
+            margin: 0;
+            padding: 5px;
+        }
+        .header p {
+            color: #7f8c8d;
+            margin: 5px 0 0 0;
+            font-size: 14px;
+        }
+        .group-section {
+            background: #fafbfc;
+            border: 1px solid #e1e8ed;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .section-title {
+            background-color: #2980b9;
+            color: white;
+            padding: 10px 15px;
+            font-size: 1.2em;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            display: inline-block;
+            width: auto;
+        }
+        .sub-text {
+            font-size: 1.05em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-right: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            background: #fff;
+        }
+        th, td {
+            border: 1px solid #bdc3c7;
+            padding: 12px;
+            text-align: center;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        th {
+            background-color: #ecf0f1;
+            color: #2980b9;
+            font-weight: bold;
+        }
+        small {
+            display: block;
+            color: #7f8c8d;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        
+        /* أزرار الإضافة والتنزيل */
+        .action-btn {
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .add-row-btn {
+            background-color: #27ae60;
+            padding: 8px 15px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .add-row-btn:hover { background-color: #2ecc71; }
+        
+        .add-group-btn {
+            background-color: #8e44ad;
+            padding: 12px 25px;
+            font-size: 16px;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+        .add-group-btn:hover { background-color: #9b59b6; }
+
+        .download-btn {
+            background-color: #e67e22;
+            padding: 12px 25px;
+            font-size: 16px;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+        .download-btn:hover { background-color: #d35400; }
+
+        /* أزرار التحكم بالجدول (أعمدة وصفوف) */
+        .table-toolbar {
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .small-btn {
+            padding: 5px 12px;
+            font-size: 12px;
+            background-color: #34495e;
+        }
+        .small-btn:hover { background-color: #2c3e50; }
+        .remove-btn {
+            background-color: #e74c3c;
+        }
+        .remove-btn:hover { background-color: #c0392b; }
+        .delete-group-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .delete-row-btn {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .controls-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* شريط التعديل العائم */
+        #format-bar {
+            position: absolute;
+            display: none;
+            background: #2c3e50;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            gap: 5px;
+            align-items: center;
+        }
+        #format-bar button, #format-bar input[type="color"] {
+            background: #fff;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        #format-bar button:hover {
+            background: #ecf0f1;
+        }
+        #format-bar input[type="color"] {
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            border: none;
+        }
+        
+        /* تأثير التعديل */
+        [contenteditable="true"] {
+            outline: 2px dashed #e74c3c;
+            background-color: #fdedec;
+            padding: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- شريط التعديل العائم -->
+<div id="format-bar" class="hide-on-export">
+    <button onclick="formatText('bold')" title="خط عريض"><b>B</b></button>
+    <button onclick="changeStyle('fontSize', 'larger')" title="تكبير الخط">A+</button>
+    <button onclick="changeStyle('fontSize', 'smaller')" title="تصغير الخط">A-</button>
+    <button onclick="changeStyle('textAlign', 'right')" title="محاذاة لليمين">➡️</button>
+    <button onclick="changeStyle('textAlign', 'center')" title="توسيط">↔️</button>
+    <button onclick="changeStyle('textAlign', 'left')" title="محاذاة لليسار">⬅️</button>
+    <input type="color" id="textColor" oninput="changeStyle('color', this.value)" title="لون النص">
+    <input type="color" id="bgColor" oninput="changeStyle('backgroundColor', this.value)" title="لون الخلفية">
+</div>
+
+<div class="container" id="main-container">
+    <div class="header">
+        <h1>نموذج مقترح توزيع الكوادر البشرية</h1>
+        <p class="hide-on-export">💡 تلميح: انقر نقراً مزدوجاً على أي نص لتعديله، واستخدم الأزرار لإضافة أو حذف (الشفتات والمواقع).</p>
+    </div>
+
+    <!-- المجموعة 1 -->
+    <div class="group-section">
+        <button class="delete-group-btn hide-on-export" onclick="this.parentElement.remove()">🗑️ حذف المجموعة</button>
+        <div class="section-title">المجموعة (1) - عنوان تنظيمي للنظام</div>
+        <div class="sub-text">شرح مبسط لقاعدة العمل هنا (مثال: يوم عمل / 3 أيام إجازة).</div>
+        
+        <!-- شريط تحكم الأعمدة -->
+        <div class="table-toolbar hide-on-export">
+            <button class="action-btn small-btn" onclick="addColumn(this)">+ إضافة شفت (عمود)</button>
+            <button class="action-btn small-btn remove-btn" onclick="removeColumn(this)">- حذف شفت</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم الموقع</th>
+                    <th>الشفت (1)</th>
+                    <th>الشفت (2)</th>
+                    <th>الشفت (3)</th>
+                    <th class="hide-on-export" style="width: 80px;">إجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>الموقع 1</td>
+                    <td>بيانات 1<br><small>وصف الشفت</small></td>
+                    <td>بيانات 1<br><small>وصف الشفت</small></td>
+                    <td>بيانات 1<br><small>وصف الشفت</small></td>
+                    <td class="hide-on-export"><button class="action-btn remove-btn delete-row-btn" onclick="this.parentElement.parentElement.remove()">❌</button></td>
+                </tr>
+                <tr>
+                    <td>الموقع 2</td>
+                    <td>بيانات 2<br><small>وصف الشفت</small></td>
+                    <td>بيانات 2<br><small>وصف الشفت</small></td>
+                    <td>بيانات 2<br><small>وصف الشفت</small></td>
+                    <td class="hide-on-export"><button class="action-btn remove-btn delete-row-btn" onclick="this.parentElement.parentElement.remove()">❌</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="action-btn add-row-btn hide-on-export" onclick="addRow(this)">+ إضافة موقع (صف)</button>
+    </div>
+
+    <div class="footer">
+        إجمالي الأفراد الموزعين: XX فرداً | ملاحظات إضافية أسفل النموذج
+    </div>
+</div>
+
+<!-- الأزرار الرئيسية أسفل الحاوية -->
+<div class="controls-container hide-on-export">
+    <button class="action-btn add-group-btn" onclick="addGroup()">+ إضافة مجموعة جديدة</button>
+    <button class="action-btn download-btn" onclick="downloadImage()">📷 حفظ كصورة (PNG)</button>
+</div>
+
+<script>
+    let currentEditingElement = null;
+
+    // 1. خاصية النقر المزدوج لظهور شريط التعديل
+    document.addEventListener('dblclick', function(e) {
+        // نمنع التعديل للأزرار والمناطق غير القابلة للتعديل
+        if (e.target.tagName.toLowerCase() !== 'button' && 
+            !e.target.closest('#format-bar') && 
+            !e.target.closest('.controls-container') &&
+            !e.target.classList.contains('hide-on-export')) {
+            
+            currentEditingElement = e.target;
+            e.target.contentEditable = "true";
+            e.target.focus();
+            
+            let bar = document.getElementById('format-bar');
+            bar.style.display = 'flex';
+            
+            let rect = e.target.getBoundingClientRect();
+            bar.style.top = (window.scrollY + rect.top - 50) + 'px';
+            bar.style.left = Math.max(10, window.scrollX + rect.left) + 'px';
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        let bar = document.getElementById('format-bar');
+        if (currentEditingElement && e.target !== currentEditingElement && !e.target.closest('#format-bar')) {
+            currentEditingElement.contentEditable = "false";
+            bar.style.display = 'none';
+            currentEditingElement = null;
+        }
+    });
+
+    function changeStyle(property, value) {
+        if (currentEditingElement) {
+            if (value === 'larger' || value === 'smaller') {
+                let currentSize = window.getComputedStyle(currentEditingElement).fontSize;
+                let newSize = parseFloat(currentSize);
+                if (value === 'larger') newSize += 2;
+                if (value === 'smaller') newSize -= 2;
+                currentEditingElement.style.fontSize = newSize + 'px';
+            } else {
+                currentEditingElement.style[property] = value;
+            }
+        }
+    }
+
+    function formatText(command) {
+        document.execCommand(command, false, null);
+    }
+
+    // 2. إدارة الأعمدة (إضافة وحذف شفتات)
+    function addColumn(btn) {
+        let table = btn.parentElement.nextElementSibling;
+        let theadTr = table.querySelector('thead tr');
+        let tbodyTrs = table.querySelectorAll('tbody tr');
+        
+        // حساب عدد الشفتات الحالية (نطرح 1 لاسم الموقع و 1 لعمود الإجراءات)
+        let colCount = theadTr.children.length - 1; 
+        
+        // إضافة لعنوان الجدول (قبل عمود الإجراءات الأخير)
+        let th = document.createElement('th');
+        th.innerHTML = `الشفت (${colCount})`;
+        theadTr.insertBefore(th, theadTr.lastElementChild);
+        
+        // إضافة لكل صف في الجدول
+        tbodyTrs.forEach(tr => {
+            let td = document.createElement('td');
+            td.innerHTML = `بيانات<br><small>وصف</small>`;
+            tr.insertBefore(td, tr.lastElementChild);
+        });
+    }
+
+    function removeColumn(btn) {
+        let table = btn.parentElement.nextElementSibling;
+        let theadTr = table.querySelector('thead tr');
+        let tbodyTrs = table.querySelectorAll('tbody tr');
+        
+        // يجب أن يبقى عمود الموقع، وعمود إجراءات، وشفت واحد على الأقل (المجموع 3)
+        if (theadTr.children.length > 3) { 
+            theadTr.removeChild(theadTr.children[theadTr.children.length - 2]);
+            tbodyTrs.forEach(tr => {
+                tr.removeChild(tr.children[tr.children.length - 2]);
+            });
+        } else {
+            alert('يجب أن يحتوي الجدول على شفت واحد على الأقل!');
+        }
+    }
+
+    // 3. إضافة صف (موقع جديد)
+    function addRow(btn) {
+        let table = btn.previousElementSibling;
+        let tbody = table.querySelector('tbody');
+        let theadTr = table.querySelector('thead tr');
+        let shiftColumnsCount = theadTr.children.length - 2; // الأعمدة باستثناء الاسم والإجراءات
+        
+        let newRow = document.createElement('tr');
+        
+        let htmlContent = `<td>موقع جديد</td>`;
+        for(let i=0; i<shiftColumnsCount; i++){
+            htmlContent += `<td>بيانات<br><small>وصف</small></td>`;
+        }
+        htmlContent += `<td class="hide-on-export"><button class="action-btn remove-btn delete-row-btn" onclick="this.parentElement.parentElement.remove()">❌</button></td>`;
+        
+        newRow.innerHTML = htmlContent;
+        tbody.appendChild(newRow);
+    }
+
+    // 4. إضافة مجموعة كاملة
+    function addGroup() {
+        let container = document.getElementById('main-container');
+        let footer = document.querySelector('.footer');
+        
+        let newGroup = document.createElement('div');
+        newGroup.className = 'group-section';
+        newGroup.innerHTML = `
+            <button class="delete-group-btn hide-on-export" onclick="this.parentElement.remove()">🗑️ حذف المجموعة</button>
+            <div class="section-title">المجموعة (الجديدة) - عنوان</div>
+            <div class="sub-text">شرح مبسط لقاعدة العمل هنا.</div>
+            
+            <div class="table-toolbar hide-on-export">
+                <button class="action-btn small-btn" onclick="addColumn(this)">+ إضافة شفت (عمود)</button>
+                <button class="action-btn small-btn remove-btn" onclick="removeColumn(this)">- حذف شفت</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>اسم الموقع</th>
+                        <th>الشفت (1)</th>
+                        <th>الشفت (2)</th>
+                        <th class="hide-on-export" style="width: 80px;">إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>موقع 1</td>
+                        <td>بيانات<br><small>وصف</small></td>
+                        <td>بيانات<br><small>وصف</small></td>
+                        <td class="hide-on-export"><button class="action-btn remove-btn delete-row-btn" onclick="this.parentElement.parentElement.remove()">❌</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="action-btn add-row-btn hide-on-export" onclick="addRow(this)">+ إضافة موقع (صف)</button>
+        `;
+        
+        container.insertBefore(newGroup, footer);
+    }
+
+    // 5. حفظ كصورة
+    function downloadImage() {
+        if (currentEditingElement) {
+            currentEditingElement.contentEditable = "false";
+            document.getElementById('format-bar').style.display = 'none';
+            currentEditingElement = null;
+        }
+
+        // إخفاء كل أزرار وأعمدة التحكم
+        let elementsToHide = document.querySelectorAll('.hide-on-export');
+        let originalDisplays = [];
+        
+        elementsToHide.forEach((el, index) => {
+            originalDisplays[index] = el.style.display; // حفظ حالة الظهور الأصلية
+            el.style.display = 'none';
+        });
+
+        let container = document.getElementById('main-container');
+
+        html2canvas(container, {
+            scale: 3, 
+            useCORS: true,
+            backgroundColor: "#f4f7f9" 
+        }).then(canvas => {
+            // إعادة العناصر بعد التصوير
+            elementsToHide.forEach((el, index) => {
+                el.style.display = originalDisplays[index];
+            });
+
+            let link = document.createElement('a');
+            link.download = 'قالب_الكوادر_البشرية.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    }
+</script>
+
+</body>
+</html>
